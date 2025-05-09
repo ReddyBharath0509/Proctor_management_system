@@ -1,0 +1,173 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10 col-lg-12 col-md-9">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Notifications</h6>
+                {% if unread_notifications_count > 0 %}
+                    <button class="btn btn-sm btn-success" id="markAllRead">
+                        <i class="fas fa-check-double me-1"></i>Mark All as Read
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for notification in notifications %}
+                        <div class="list-group-item {% if not notification.is_read %}unread{% endif %}" 
+                             data-notification-id="{{ notification.id }}">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <p class="mb-1">{{ notification.message }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ notification.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                                {% if not notification.is_read %}
+                                    <button class="btn btn-sm btn-outline-primary mark-read ms-3">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-bell-slash fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-500">No notifications</h5>
+                            <p class="text-gray-400">You're all caught up!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #e3e6f0;
+        transition: all 0.3s ease;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .list-group-item:hover {
+        background-color: #f8f9fc;
+    }
+    
+    .list-group-item.unread {
+        background-color: #f8f9fc;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .list-group-item.unread h6 {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .btn-outline-primary {
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mark single notification as read
+    document.querySelectorAll('.mark-read').forEach(button => {
+        button.addEventListener('click', function() {
+            const notificationItem = this.closest('.list-group-item');
+            const notificationId = notificationItem.dataset.notificationId;
+            
+            fetch(`/notifications/${notificationId}/mark-read/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    notificationItem.classList.remove('unread');
+                    this.remove();
+                    updateUnreadCount();
+                }
+            });
+        });
+    });
+    
+    // Mark all notifications as read
+    const markAllReadBtn = document.getElementById('markAllRead');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', function() {
+            fetch('/notifications/mark-all-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.list-group-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        const button = item.querySelector('.mark-read');
+                        if (button) button.remove();
+                    });
+                    this.remove();
+                    updateUnreadCount();
+                }
+            });
+        });
+    }
+    
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Update unread count in navbar
+    function updateUnreadCount() {
+        const badge = document.querySelector('.navbar .badge');
+        if (badge) {
+            const currentCount = parseInt(badge.textContent);
+            if (currentCount > 1) {
+                badge.textContent = currentCount - 1;
+            } else {
+                badge.remove();
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Meetings</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Student</th>
+                <th>Agenda</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for meeting in meetings %}
+            <tr>
+                <td>{{ meeting.date }}</td>
+                <td>{{ meeting.time }}</td>
+                <td>{{ meeting.student.user.get_full_name }}</td>
+                <td>{{ meeting.agenda }}</td>
+                <td>
+                    <form method="post" action="{% url 'update_meeting_status' meeting.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="upcoming{{ meeting.id }}" value="upcoming" {% if meeting.status == 'upcoming' %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label" for="upcoming{{ meeting.id }}">Upcoming</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="completed{{ meeting.id }}" value="completed" {% if meeting.status == 'completed' %}checked{% endif %} onchange="this.form.submit()">
+                            <label class="form-check-label" for="completed{{ meeting.id }}">Completed</label>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No meetings found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

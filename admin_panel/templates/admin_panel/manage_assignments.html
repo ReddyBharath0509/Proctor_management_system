@@ -1,0 +1,110 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Manage Student-Teacher Assignments</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Assignment Form -->
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label for="student" class="form-label">Select Student</label>
+                                    <select name="student" id="student" class="form-select" required>
+                                        <option value="">Choose a student...</option>
+                                        {% for student in unassigned_students %}
+                                            <option value="{{ student.id }}">{{ student.user.get_full_name }} ({{ student.roll_number }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="mb-3">
+                                    <label for="teacher" class="form-label">Select Teacher</label>
+                                    <select name="teacher" id="teacher" class="form-select" required>
+                                        <option value="">Choose a teacher...</option>
+                                        {% for teacher in teachers %}
+                                            <option value="{{ teacher.id }}">{{ teacher.user.get_full_name }} ({{ teacher.department }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Assign</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Current Assignments -->
+                    <h4 class="mb-3">Current Assignments</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Roll Number</th>
+                                    <th>Department</th>
+                                    <th>Assigned To</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in assignments %}
+                                    <tr>
+                                        <td>{{ student.user.get_full_name }}</td>
+                                        <td>{{ student.roll_number }}</td>
+                                        <td>{{ student.department }}</td>
+                                        <td>{{ student.assigned_proctor.user.get_full_name }}</td>
+                                        <td>
+                                            <a href="{% url 'remove_assignment' student.id %}" 
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Are you sure you want to remove this assignment?')">
+                                                <i class="fas fa-times"></i> Remove
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No assignments found</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+    }
+    .btn-primary {
+        padding: 10px 15px;
+        border-radius: 8px;
+    }
+    .table {
+        margin-bottom: 0;
+    }
+    .btn-danger {
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %} 

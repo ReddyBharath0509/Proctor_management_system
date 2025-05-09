@@ -1,0 +1,67 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Delete Marks</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h4 class="alert-heading">Are you sure?</h4>
+                        <p>You are about to delete the following marks:</p>
+                        <ul class="mb-0">
+                            <li><strong>Student:</strong> {{ marks.student.user.get_full_name }}</li>
+                            <li><strong>Subject:</strong> {{ marks.subject }}</li>
+                            <li><strong>Marks:</strong> {{ marks.marks }}%</li>
+                            <li><strong>Semester:</strong> {{ marks.semester }}</li>
+                            <li><strong>Date Added:</strong> {{ marks.date|date:"d M Y" }}</li>
+                        </ul>
+                        <hr>
+                        <p class="mb-0"><strong>Note:</strong> This action cannot be undone.</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i> Delete Marks
+                            </button>
+                            <a href="{{ previous_page }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .alert {
+        border-radius: 8px;
+    }
+    .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+</style>
+{% endblock %} 

@@ -1,0 +1,389 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'teacher_chat' %}" class="btn btn-primary">
+                            <i class="fas fa-comments"></i> Chat with Students
+                        </a>
+                        
+                        
+                        <a href="{% url 'student_management' %}" class="btn btn-info">
+                            <i class="fas fa-users"></i> Manage Students
+                        </a>
+                        <a href="{% url 'teacher_timetable' %}" class="btn btn-success">
+                            <i class="fas fa-calendar-alt"></i> View Timetable
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h4 class="mb-4">Welcome, {{ request.user.get_full_name|default:request.user.username }}</h4>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <p class="mb-2"><strong>Department:</strong><br>{{ request.user.teacher.department }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <p class="mb-2"><strong>Designation:</strong><br>{{ request.user.teacher.designation }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <p class="mb-2"><strong>Email:</strong><br>{{ request.user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistics Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Assigned Students</h5>
+                                    <h2 class="mb-0">{{ assigned_students_count }}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Upcoming Meetings</h5>
+                                    <h2 class="mb-0">{{ upcoming_meetings_count }}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Attendance Statistics</h5>
+                                    <h2 class="mb-0">{{ attendance_stats.percentage }}%</h2>
+                                    <p class="mb-0">Present: {{ attendance_stats.present }} / Total: {{ attendance_stats.total }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Your Meetings</h5>
+                                    <h2 class="mb-0">{{ total_meetings_count }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regular Time Slots Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Regular Time Slots</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Students</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for slot in regular_slots %}
+                                <tr>
+                                    <td>{{ slot.get_day_display }}</td>
+                                    <td>{{ slot.get_time_display }}</td>
+                                    <td>{{ slot.students.all|join:", " }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Meetings Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Upcoming Meetings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for meeting in upcoming_meetings %}
+                                <tr>
+                                    <td>{{ meeting.get_day_display }}</td>
+                                    <td>{{ meeting.get_time_display }}</td>
+                                    <td><span class="badge bg-success">Upcoming</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No upcoming meetings scheduled</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Past Meetings Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Past Meetings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for meeting in past_meetings %}
+                                <tr>
+                                    <td>{{ meeting.get_day_display }}</td>
+                                    <td>{{ meeting.get_time_display }}</td>
+                                    <td><span class="badge bg-secondary">Completed</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No past meetings found</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Students Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Assigned Students</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in assigned_students %}
+                                <tr>
+                                    <td>{{ student.user.get_full_name|default:student.user.username }}</td>
+                                    <td>{{ student.department.name|default:"Not Assigned" }}</td>
+                                    <td>{{ student.semester }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'mark_attendance' student.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-clipboard-check"></i>
+                                            </a>
+                                            <a href="{% url 'manage_marks' %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-graduation-cap"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Recent Attendance Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Attendance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Student</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in recent_attendance %}
+                                <tr>
+                                    <td>{{ attendance.date|date:"F d, Y" }}</td>
+                                    <td>{{ attendance.student.user.get_full_name|default:attendance.student.user.username }}</td>
+                                    <td>
+                                        <span class="badge {% if attendance.status == 'Present' %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ attendance.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ attendance.remarks }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Meeting Summaries Section -->
+    <!-- <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Meeting Summaries</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_summaries %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Meeting</th>
+                                    <th>Summary</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for summary in recent_summaries %}
+                                <tr>
+                                    <td>{{ summary.meeting.date|date:"F d, Y" }}</td>
+                                    <td>{{ summary.meeting.title }}</td>
+                                    <td>{{ summary.summary|truncatechars:100 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No meeting summaries available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div> -->
+</div>
+
+<style>
+    .container-fluid {
+        padding: 0 15px;
+    }
+    .card {
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        border: none;
+        border-radius: 0.35rem;
+        margin-bottom: 1.5rem;
+    }
+    .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1rem;
+    }
+    .card-body {
+        padding: 1.25rem;
+    }
+    .table th {
+        border-top: none;
+        background-color: #f8f9fc;
+        padding: 0.75rem;
+    }
+    .table td {
+        padding: 0.75rem;
+        vertical-align: middle;
+    }
+    .btn-group .btn {
+        margin-right: 5px;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .badge {
+        padding: 0.5em 0.75em;
+        font-weight: 500;
+    }
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .col-md-3, .col-md-6, .col-md-12 {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    @media (min-width: 768px) {
+        .col-md-3, .col-md-6, .col-md-12 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+    }
+</style>
+{% endblock %} 

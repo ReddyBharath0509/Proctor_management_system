@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Timetable</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    {% for day, day_info in timetable.items %}
+                                    <th class="{% if day == today_weekday %}table-primary{% endif %}">
+                                        {{ day_info.name }}
+                                        {% if day == today_weekday %}(Today){% endif %}
+                                    </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for time, time_name in time_choices %}
+                                <tr>
+                                    <td>{{ time_name }}</td>
+                                    {% for day, day_info in timetable.items %}
+                                    <td class="{% if day == today_weekday %}table-primary{% endif %}">
+                                        {% for slot in day_info.slots %}
+                                            {% if slot.time == time %}
+                                                <div class="p-2">
+                                                    <strong>Students:</strong>
+                                                    <ul class="list-unstyled mb-0">
+                                                        {% for student in slot.students.all %}
+                                                        <li>{{ student.user.get_full_name }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

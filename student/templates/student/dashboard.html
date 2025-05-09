@@ -1,0 +1,110 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="card-title mb-1">Welcome, {{ student.user.get_full_name }}</h4>
+                            <p class="text-muted mb-0">Roll Number: {{ student.roll_number }}</p>
+                            <p class="text-muted mb-0">Department: {{ student.department }}</p>
+                            <p class="text-muted mb-0">Semester: {{ student.semester }}</p>
+                        </div>
+                        <div class="text-end">
+                            
+                            <h5 class="mb-1">Your Proctor</h5>
+                            <p class="mb-0">{{ proctor.user.get_full_name }}</p>
+                            <p class="mb-0">{{ proctor.department }}</p>
+                            <p class="mb-0">{{ proctor.designation }}</p>
+                            <p class="mb-0">{{ proctor.user.email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-start gap-3">
+                        <a href="{% url 'student_chat' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-comments me-2"></i>Chat with Proctor
+                        </a>
+                        <a href="{% url 'student_meetings' %}" class="btn btn-info btn-lg">
+                            <i class="fas fa-calendar me-2"></i>View Meetings
+                        </a>
+                        <a href="{% url 'student_marks' %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-chart-bar me-2"></i>View Marks
+                        </a>
+                        <a href="{% url 'student_attendance' %}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-clipboard-list me-2"></i>View Attendance
+                        </a>
+                        <a href="{% url 'student_timetable' %}" class="btn btn-info btn-lg">
+                            <i class="fas fa-calendar-alt me-2"></i>View Timetable
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row mb-4">
+        <!-- Upcoming Meetings Card -->
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Upcoming Meetings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ upcoming_meetings_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Card -->
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Attendance
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ attendance_percentage|floatformat:1 }}%
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    Present: {{ present_count }} | Absent: {{ absent_count }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+{% endblock %} 

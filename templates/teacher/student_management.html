@@ -1,0 +1,59 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Student Management</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Assigned Students -->
+                        <div >
+                            <h6>Assigned Students</h6>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Department</th>
+                                            <th>Semester</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for student in assigned_students %}
+                                        <tr>
+                                            <td>{{ student.user.get_full_name|default:student.user.username }}</td>
+                                            <td>{{ student.department|default:"Not Assigned" }}</td>
+                                            <td>{{ student.semester }}</td>
+                                            <td>
+                                                <form method="post" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                                                    <input type="hidden" name="action" value="unassign">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-user-minus"></i> Unassign
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">No students assigned</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

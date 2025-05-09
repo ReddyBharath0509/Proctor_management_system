@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Notifications</h5>
+                    {% if notifications %}
+                    <button class="btn btn-sm btn-primary" id="markAllRead">Mark All as Read</button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        <div class="list-group">
+                            {% for notification in notifications %}
+                            <div class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-primary{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <small>{{ notification.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1">{{ notification.message }}</p>
+                                <small class="text-muted">{{ notification.get_notification_type_display }}</small>
+                                {% if not notification.is_read %}
+                                <button class="btn btn-sm btn-outline-primary float-end mark-read" data-id="{{ notification.id }}">
+                                    Mark as Read
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center">No notifications found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mark single notification as read
+    document.querySelectorAll('.mark-read').forEach(button => {
+        button.addEventListener('click', function() {
+            const notificationId = this.dataset.id;
+            fetch(`/notifications/mark-read/${notificationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.closest('.list-group-item').classList.remove('list-group-item-primary');
+                    this.remove();
+                }
+            });
+        });
+    });
+
+    // Mark all notifications as read
+    document.getElementById('markAllRead')?.addEventListener('click', function() {
+        fetch('/notifications/mark-all-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelectorAll('.list-group-item-primary').forEach(item => {
+                    item.classList.remove('list-group-item-primary');
+                });
+                document.querySelectorAll('.mark-read').forEach(button => button.remove());
+                this.remove();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,49 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}My Meetings{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Meetings</h2>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Meetings Scheduled by Teacher</h4>
+        </div>
+        <div class="card-body">
+            {% if meetings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Teacher</th>
+                                <th>Agenda</th>
+                                <th>Summary</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meeting in meetings %}
+                                <tr>
+                                    <td>{{ meeting.date }}</td>
+                                    <td>{{ meeting.time }}</td>
+                                    <td>{{ meeting.teacher.user.get_full_name }}</td>
+                                    <td>{{ meeting.agenda }}</td>
+                                    <td>{{ meeting.summary|default:'-' }}</td>
+                                    <td>{{ meeting.get_status_display }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No meetings scheduled by your teacher.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

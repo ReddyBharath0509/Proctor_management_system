@@ -1,0 +1,45 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Add Meeting Summary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Add Meeting Summary</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>Meeting Details</h5>
+                        <p><strong>Date:</strong> {{ meeting.date|date:"F d, Y" }}</p>
+                        <p><strong>Time:</strong> {{ meeting.time|time:"g:i A" }}</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="summary_text" class="form-label">Summary</label>
+                            <textarea class="form-control" id="summary_text" name="summary_text" rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="action_items" class="form-label">Action Items</label>
+                            <textarea class="form-control" id="action_items" name="action_items" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="next_meeting_suggestions" class="form-label">Suggestions for Next Meeting</label>
+                            <textarea class="form-control" id="next_meeting_suggestions" name="next_meeting_suggestions" rows="3"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Summary</button>
+                        <a href="{% url 'view_meeting_summaries' %}" class="btn btn-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

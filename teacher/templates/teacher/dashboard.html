@@ -1,0 +1,285 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Navigation Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="card-title">Welcome, {{ teacher.user.get_full_name }}</h4>
+                            <p class="card-text mb-0">
+                                Department: {{ teacher.department }}<br>
+                                Designation: {{ teacher.designation }}<br>
+                                Email: {{ teacher.user.email }}
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'create_meeting' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-calendar-plus"></i> Create Meeting
+                            </a>
+                            <a href="{% url 'meeting_management' %}" class="btn btn-info btn-lg">
+                                <i class="fas fa-calendar-alt"></i> Manage Meetings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="row mb-4">
+        <!-- Assigned Students Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Assigned Students</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ assigned_students_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Meetings Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Upcoming Meetings</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ upcoming_meetings_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Statistics Card -->
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Attendance Statistics</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ attendance_stats.percentage }}%</div>
+                            <div class="small text-muted mt-1">
+                                Present: {{ attendance_stats.present }} / Total: {{ attendance_stats.total }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    
+
+    <!-- Detailed Sections -->
+    <div class="row">
+        <!-- Upcoming Meetings Section -->
+        <div class="col-xl-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Meetings</h6>
+                    <a href="{% url 'meeting_management' %}" class="btn btn-sm btn-primary">
+                        Manage Meetings
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if time_slots %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slot in time_slots %}
+                                        {% if slot.day > current_day or slot.day == current_day and slot.time >= current_hour %}
+                                            <tr>
+                                                <td>{{ slot.get_day_display }}</td>
+                                                <td>{{ slot.get_time_display }}</td>
+                                                <td>
+                                                    <span class="badge bg-success">Upcoming</span>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No upcoming meetings scheduled.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Past Meetings Section -->
+        <div class="col-xl-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Past Meetings</h6>
+                </div>
+                <div class="card-body">
+                    {% if time_slots %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slot in time_slots %}
+                                        {% if slot.day < current_day or slot.day == current_day and slot.time < current_hour %}
+                                            <tr>
+                                                <td>{{ slot.get_day_display }}</td>
+                                                <td>{{ slot.get_time_display }}</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">Completed</span>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No past meetings found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Student List -->
+        <div class="col-xl-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Assigned Students</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                            aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item" href="{% url 'manage_marks' %}">Manage Marks</a>
+                            <a class="dropdown-item" href="{% url 'teacher_timetable' %}">View Timetable</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in assigned_students %}
+                                <tr>
+                                    <td>{{ student.user.get_full_name }}</td>
+                                    <td>{{ student.department }}</td>
+                                    <td>{{ student.semester }}</td>
+                                    <td>
+                                        <a href="{% url 'mark_attendance' student.id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-clipboard-check"></i> Attendance
+                                        </a>
+                                        <a href="{% url 'manage_marks' %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-graduation-cap"></i> Marks
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No students assigned</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+      
+
+        <!-- Recent Attendance -->
+        <div class="col-xl-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Attendance</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_attendance %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Student</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_attendance %}
+                                <tr>
+                                    <td>{{ record.date }}</td>
+                                    <td>{{ record.student.user.get_full_name }}</td>
+                                    <td>
+                                        {% if record.is_present %}
+                                        <span class="badge badge-success" style="background-color: #28a745; color: white;">Present</span>
+                                        {% else %}
+                                        <span class="badge badge-danger" style="background-color: #dc3545; color: white;">Absent</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ record.remarks }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center">No recent attendance records</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

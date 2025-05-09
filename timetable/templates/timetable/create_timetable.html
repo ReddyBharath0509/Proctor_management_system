@@ -1,0 +1,233 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Create New Timetable</h1>
+        <a href="{% url 'timetable_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Timetable Details</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="academic_year" class="form-label">Academic Year</label>
+                                <input type="text" class="form-control" id="academic_year" name="academic_year" 
+                                       placeholder="e.g., 2023-2024" required>
+                                <div class="invalid-feedback">
+                                    Please enter the academic year.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="department" class="form-label">Department</label>
+                                <select class="form-select" id="department" name="department" required>
+                                    <option value="">Select Department</option>
+                                    {% for dept in departments %}
+                                        <option value="{{ dept }}">{{ dept }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a department.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="semester" class="form-label">Semester</label>
+                                <select class="form-select" id="semester" name="semester" required>
+                                    <option value="">Select Semester</option>
+                                    {% for sem in semesters %}
+                                        <option value="{{ sem }}">Semester {{ sem }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a semester.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="mb-3">Theory Subjects</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Teacher</th>
+                                                <th>Room</th>
+                                                <th>Time Slot</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for subject in subjects %}
+                                                {% if not subject.is_lab %}
+                                                    <tr>
+                                                        <td>{{ subject.name }}</td>
+                                                        <td>
+                                                            <select class="form-select" name="teacher_{{ subject.id }}" required>
+                                                                <option value="">Select Teacher</option>
+                                                                {% for teacher in teachers %}
+                                                                    {% if teacher.department == subject.department %}
+                                                                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-select" name="room_{{ subject.id }}" required>
+                                                                <option value="">Select Room</option>
+                                                                {% for room in rooms %}
+                                                                    {% if not room.is_lab %}
+                                                                        <option value="{{ room.id }}">{{ room.name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-select" name="time_slot_{{ subject.id }}" required>
+                                                                <option value="">Select Time Slot</option>
+                                                                {% for slot in time_slots %}
+                                                                    {% if not slot.is_lab %}
+                                                                        <option value="{{ slot.id }}">{{ slot.get_day_display }} - {{ slot.get_time_display }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="mb-3">Lab Subjects</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Subject</th>
+                                                <th>Teacher</th>
+                                                <th>Lab Room</th>
+                                                <th>Time Slot</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for subject in subjects %}
+                                                {% if subject.is_lab %}
+                                                    <tr>
+                                                        <td>{{ subject.name }}</td>
+                                                        <td>
+                                                            <select class="form-select" name="teacher_{{ subject.id }}" required>
+                                                                <option value="">Select Teacher</option>
+                                                                {% for teacher in teachers %}
+                                                                    {% if teacher.department == subject.department %}
+                                                                        <option value="{{ teacher.id }}">{{ teacher.get_full_name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-select" name="room_{{ subject.id }}" required>
+                                                                <option value="">Select Lab Room</option>
+                                                                {% for room in rooms %}
+                                                                    {% if room.is_lab %}
+                                                                        <option value="{{ room.id }}">{{ room.name }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-select" name="time_slot_{{ subject.id }}" required>
+                                                                <option value="">Select Time Slot</option>
+                                                                {% for slot in time_slots %}
+                                                                    {% if slot.is_lab %}
+                                                                        <option value="{{ slot.id }}">{{ slot.get_day_display }} - {{ slot.get_time_display }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Generate Timetable
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        margin-bottom: 0;
+    }
+    .table th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+    .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        border-radius: 10px 10px 0 0 !important;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+    }
+    .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+    }
+</style>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %} 

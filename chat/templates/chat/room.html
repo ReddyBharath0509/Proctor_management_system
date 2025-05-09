@@ -1,0 +1,116 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        Chat with 
+                        {% if user.role == 'teacher' %}
+                            {{ chat_room.student.user.get_full_name }}
+                        {% else %}
+                            {{ chat_room.teacher.user.get_full_name }}
+                        {% endif %}
+                    </h6>
+                    <a href="{% url 'chat:chat_room_list' %}" class="btn btn-sm btn-secondary">
+                        Back to Chats
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div id="chat-messages" class="chat-messages mb-3" style="height: 400px; overflow-y: auto;">
+                        {% for message in messages %}
+                            <div class="message {% if message.sender == user %}sent{% else %}received{% endif %} mb-2">
+                                <div class="message-content p-2 rounded {% if message.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                    {{ message.content }}
+                                </div>
+                                <small class="text-muted">{{ message.timestamp|timesince }} ago</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="chat-input">
+                        <form id="chat-form" class="d-flex">
+                            <input type="text" id="chat-message-input" class="form-control" placeholder="Type your message...">
+                            <button type="submit" class="btn btn-primary ms-2">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const roomId = {{ chat_room.id }};
+    const userId = {{ user.id }};
+    
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + roomId + '/'
+    );
+    
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${data.sender_id == userId ? 'sent' : 'received'} mb-2`;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = `message-content p-2 rounded ${data.sender_id == userId ? 'bg-primary text-white' : 'bg-light'}`;
+        contentDiv.textContent = data.message;
+        
+        const timeDiv = document.createElement('small');
+        timeDiv.className = 'text-muted';
+        timeDiv.textContent = 'Just now';
+        
+        messageDiv.appendChild(contentDiv);
+        messageDiv.appendChild(timeDiv);
+        
+        document.querySelector('#chat-messages').appendChild(messageDiv);
+        document.querySelector('#chat-messages').scrollTop = document.querySelector('#chat-messages').scrollHeight;
+    };
+    
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+    
+    document.querySelector('#chat-form').onsubmit = function(e) {
+        e.preventDefault();
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'sender_id': userId
+        }));
+        
+        messageInputDom.value = '';
+    };
+</script>
+
+<style>
+    .chat-messages {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    
+    .message {
+        max-width: 70%;
+    }
+    
+    .message.sent {
+        margin-left: auto;
+        text-align: right;
+    }
+    
+    .message.received {
+        margin-right: auto;
+    }
+    
+    .message-content {
+        display: inline-block;
+        word-wrap: break-word;
+    }
+</style>
+{% endblock %} 

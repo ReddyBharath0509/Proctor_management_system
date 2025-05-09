@@ -1,0 +1,129 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Time Slot</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="day" class="form-label">Day</label>
+                            <select class="form-select" id="day" name="day" required>
+                                {% for value, label in day_choices %}
+                                    <option value="{{ value }}" {% if value == time_slot.day %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Time</label>
+                            <select class="form-select" id="time" name="time" required>
+                                {% for value, label in time_choices %}
+                                    <option value="{{ value }}" {% if value == time_slot.time %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="teacher" class="form-label">Teacher</label>
+                            <select class="form-select" id="teacher" name="teacher" required>
+                                <option value="">Select a teacher</option>
+                                {% for teacher in teachers %}
+                                    <option value="{{ teacher.id }}" {% if teacher.id == time_slot.teacher.id %}selected{% endif %}>
+                                        {{ teacher.user.get_full_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="students" class="form-label">Students (Maximum: {{ max_students }})</label>
+                            <select class="form-select" id="students" name="students" multiple required>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}" {% if student in time_slot.students.all %}selected{% endif %}>
+                                        {{ student.user.get_full_name }} ({{ student.roll_number }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Hold Ctrl/Cmd to select multiple students</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if time_slot.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">Active</label>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'time_slots' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Time Slots
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Time Slot
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+    .form-select {
+        border-radius: 8px;
+    }
+    #students {
+        height: 200px;
+    }
+    .alert {
+        border-radius: 8px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentsSelect = document.getElementById('students');
+        const maxStudents = {{ max_students }};
+        
+        // Initialize select2 for better UX
+        if (typeof $.fn.select2 !== 'undefined') {
+            $('#students').select2({
+                placeholder: 'Select students',
+                allowClear: true,
+                width: '100%',
+                maximumSelectionLength: maxStudents
+            });
+            
+            // Add validation for maximum students
+            $('#students').on('change', function() {
+                if ($(this).val().length > maxStudents) {
+                    alert(`You can only select up to ${maxStudents} students`);
+                    $(this).val($(this).val().slice(0, maxStudents)).trigger('change');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

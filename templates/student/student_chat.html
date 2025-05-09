@@ -1,0 +1,14 @@
+{% extends 'chat/chat_base.html' %}
+
+{% block content %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Additional student-specific functionality
+        const chatSocket = document.querySelector('script').previousElementSibling.querySelector('script').textContent;
+        
+        // Add student-specific event listeners or functionality here
+        // For example, you might want to add functionality to request help from teachers
+    });
+</script>
+{% endblock %} 

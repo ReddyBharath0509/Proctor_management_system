@@ -1,0 +1,253 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">My Teaching Schedule</h1>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print me-1"></i>Print Schedule
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                {{ teacher.get_full_name }}
+                            </h6>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-primary">{{ timetable.academic_year }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    {% for day in days %}
+                                        <th>{{ day }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for time_slot in time_slots %}
+                                    <tr>
+                                        <td>{{ time_slot.get_time_display }}</td>
+                                        {% for day in days %}
+                                            <td>
+                                                {% with slot=schedule_matrix|get_item:time_slot.id|get_item:day %}
+                                                    {% if slot %}
+                                                        <div>{{ slot.subject }}</div>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Class Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>Room</th>
+                                    <th>Schedule</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subjects %}
+                                    <tr>
+                                        <td>{{ subject.name }}</td>
+                                        <td>{{ subject.timetable.department }}</td>
+                                        <td>{{ subject.timetable.semester }}</td>
+                                        <td>{{ subject.room.name }}</td>
+                                        <td>
+                                            {% for schedule in subject.schedules %}
+                                                {{ schedule.time_slot.day }} {{ schedule.time_slot.start_time }} - {{ schedule.time_slot.end_time }}<br>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Teaching Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Total Classes</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_classes }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Total Students</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_students }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Departments</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ departments|length }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Subjects</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ subjects|length }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        margin-bottom: 0;
+    }
+    .table th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .table td {
+        vertical-align: middle;
+        min-width: 150px;
+    }
+    .schedule-item {
+        background-color: #f8f9fc;
+        border-radius: 8px;
+        padding: 10px;
+        margin: 5px;
+    }
+    .schedule-item .subject {
+        font-weight: 600;
+        color: #4e73df;
+        margin-bottom: 5px;
+    }
+    .schedule-item .department {
+        font-size: 0.9rem;
+        color: #858796;
+        margin-bottom: 3px;
+    }
+    .schedule-item .room {
+        font-size: 0.8rem;
+        color: #5a5c69;
+    }
+    .border-left-primary {
+        border-left: 4px solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 4px solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 4px solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 4px solid #f6c23e !important;
+    }
+    @media print {
+        .btn {
+            display: none;
+        }
+        .card {
+            border: 1px solid #e3e6f0;
+        }
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        .schedule-item {
+            background-color: #ffffff;
+            border: 1px solid #e3e6f0;
+        }
+    }
+</style>
+
+<script>
+// Helper function to get dictionary items in template
+function get_item(dictionary, key) {
+    return dictionary[key];
+}
+</script>
+{% endblock %} 

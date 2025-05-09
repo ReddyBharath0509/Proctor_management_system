@@ -1,0 +1,129 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Timetable</h1>
+        <div>
+            <a href="{% url 'timetable_dashboard' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print me-1"></i>Print Timetable
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                {{ timetable.department }} - Semester {{ timetable.semester }}
+                            </h6>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-primary">{{ timetable.academic_year }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    {% for day in days %}
+                                        <th>{{ day }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for time_slot in time_slots %}
+                                    <tr>
+                                        <td class="fw-bold">{{ time_slot.start_time }} - {{ time_slot.end_time }}</td>
+                                        {% for day in days %}
+                                            <td>
+                                                {% with schedule=schedule_matrix|get_item:time_slot.id|get_item:day %}
+                                                    {% if schedule %}
+                                                        <div class="schedule-item">
+                                                            <div class="subject">{{ schedule.subject.name }}</div>
+                                                            <div class="teacher">{{ schedule.teacher.get_full_name }}</div>
+                                                            <div class="room">{{ schedule.room.name }}</div>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        margin-bottom: 0;
+    }
+    .table th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .table td {
+        vertical-align: middle;
+        min-width: 150px;
+    }
+    .schedule-item {
+        background-color: #f8f9fc;
+        border-radius: 8px;
+        padding: 10px;
+        margin: 5px;
+    }
+    .schedule-item .subject {
+        font-weight: 600;
+        color: #4e73df;
+        margin-bottom: 5px;
+    }
+    .schedule-item .teacher {
+        font-size: 0.9rem;
+        color: #858796;
+        margin-bottom: 3px;
+    }
+    .schedule-item .room {
+        font-size: 0.8rem;
+        color: #5a5c69;
+    }
+    @media print {
+        .btn {
+            display: none;
+        }
+        .card {
+            border: 1px solid #e3e6f0;
+        }
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        .schedule-item {
+            background-color: #ffffff;
+            border: 1px solid #e3e6f0;
+        }
+    }
+</style>
+
+<script>
+// Helper function to get dictionary items in template
+function get_item(dictionary, key) {
+    return dictionary[key];
+}
+</script>
+{% endblock %} 

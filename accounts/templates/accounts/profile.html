@@ -1,0 +1,98 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-10 col-lg-12 col-md-9">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Profile Information</h6>
+                <a href="{% url 'edit_profile' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit me-1"></i>Edit Profile
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div class="profile-image mb-4">
+                            <i class="fas fa-user-circle fa-5x text-gray-300"></i>
+                        </div>
+                        <h4 class="mb-0">{{ user.get_full_name }}</h4>
+                        <p class="text-muted">{{ user.get_role_display }}</p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-gray-600">First Name</p>
+                                <h6 class="mb-4">{{ user.first_name }}</h6>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-gray-600">Last Name</p>
+                                <h6 class="mb-4">{{ user.last_name }}</h6>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-gray-600">Email</p>
+                                <h6 class="mb-4">{{ user.email }}</h6>
+                            </div>
+                            <div class="col-sm-3">
+                                <p class="mb-0 text-gray-600">Username</p>
+                                <h6 class="mb-4">{{ user.username }}</h6>
+                            </div>
+                        </div>
+                        {% if profile %}
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h5 class="mb-3">Additional Information</h5>
+                                    {% if user.role == 'student' %}
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0 text-gray-600">Roll Number</p>
+                                                <h6 class="mb-4">{{ profile.roll_number }}</h6>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <p class="mb-0 text-gray-600">Department</p>
+                                                <h6 class="mb-4">{{ profile.department }}</h6>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <p class="mb-0 text-gray-600">Semester</p>
+                                                <h6 class="mb-4">{{ profile.semester }}</h6>
+                                            </div>
+                                        </div>
+                                    {% elif user.role == 'teacher' %}
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <p class="mb-0 text-gray-600">Department</p>
+                                                <h6 class="mb-4">{{ profile.department }}</h6>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <p class="mb-0 text-gray-600">Designation</p>
+                                                <h6 class="mb-4">{{ profile.designation }}</h6>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fc;
+        border-radius: 50%;
+    }
+    
+    .text-gray-600 {
+        color: #858796 !important;
+    }
+</style>
+{% endblock %} 

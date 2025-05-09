@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Meetings{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Meetings</h2>
+
+    <!-- Upcoming Meetings -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Upcoming Meetings</h4>
+        </div>
+        <div class="card-body">
+            {% if upcoming_meetings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Students</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meeting in upcoming_meetings %}
+                                <tr>
+                                    <td>{{ meeting.date|date:"d M Y" }}</td>
+                                    <td>{{ meeting.time|time:"H:i" }}</td>
+                                    <td>{{ meeting.students.count }} students</td>
+                                    <td>
+                                        <span class="badge bg-warning">Upcoming</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'teacher_meeting_details' meeting.id %}" class="btn btn-sm btn-info">View Details</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No upcoming meetings scheduled.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Past Meetings -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Past Meetings</h4>
+        </div>
+        <div class="card-body">
+            {% if past_meetings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Students</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meeting in past_meetings %}
+                                <tr>
+                                    <td>{{ meeting.date|date:"d M Y" }}</td>
+                                    <td>{{ meeting.time|time:"H:i" }}</td>
+                                    <td>{{ meeting.students.count }} students</td>
+                                    <td>
+                                        <span class="badge bg-success">Completed</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'teacher_meeting_details' meeting.id %}" class="btn btn-sm btn-info">View Details</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No past meetings found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Cancelled Meetings -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Cancelled Meetings</h4>
+        </div>
+        <div class="card-body">
+            {% if cancelled_meetings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Students</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meeting in cancelled_meetings %}
+                                <tr>
+                                    <td>{{ meeting.date|date:"d M Y" }}</td>
+                                    <td>{{ meeting.time|time:"H:i" }}</td>
+                                    <td>{{ meeting.students.count }} students</td>
+                                    <td>
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'teacher_meeting_details' meeting.id %}" class="btn btn-sm btn-info">View Details</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No cancelled meetings found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

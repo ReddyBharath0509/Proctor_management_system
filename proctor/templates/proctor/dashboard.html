@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Welcome Card -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Welcome, {{ proctor.user.get_full_name }}!</h4>
+                    <p class="card-text">Department: {{ proctor.department }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="col-md-3 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Assigned Students</h5>
+                    <p class="card-text display-4">{{ student_count }}</p>
+                    <a href="{% url 'student_list' %}" class="text-white">View Details →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Today's Meetings</h5>
+                    <p class="card-text display-4">{{ today_meetings_count }}</p>
+                    <a href="{% url 'proctor_meetings' %}" class="text-white">View Details →</a>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Attendance</h5>
+                    <p class="card-text display-4">{{ pending_attendance_count }}</p>
+                    <a href="{% url 'mark_attendance' %}" class="text-white">View Details →</a>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <!-- Recent Issues -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Issues</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_issues %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Title</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for issue in recent_issues %}
+                                    <tr>
+                                        <td>{{ issue.student.user.get_full_name }}</td>
+                                        <td>{{ issue.title }}</td>
+                                        <td>
+                                            <span class="badge {% if issue.status == 'open' %}bg-danger{% elif issue.status == 'in_progress' %}bg-warning{% elif issue.status == 'resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ issue.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'proctor_issue_detail' issue.id %}" class="btn btn-sm btn-info">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="{% url 'proctor_issues' %}" class="btn btn-primary">View All Issues</a>
+                    {% else %}
+                        <p class="text-muted">No recent issues reported.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

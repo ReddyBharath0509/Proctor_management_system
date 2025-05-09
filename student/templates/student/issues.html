@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Issues{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">My Reported Issues</h4>
+                </div>
+                <div class="card-body">
+                    {% if issues %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Reported On</th>
+                                        <th>Last Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for issue in issues %}
+                                        <tr>
+                                            <td>{{ issue.title }}</td>
+                                            <td>{{ issue.description }}</td>
+                                            <td>
+                                                <span class="badge {% if issue.priority == 'high' %}bg-danger{% elif issue.priority == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
+                                                    {{ issue.get_priority_display }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge {% if issue.status == 'open' %}bg-primary{% elif issue.status == 'in_progress' %}bg-warning{% else %}bg-success{% endif %}">
+                                                    {{ issue.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ issue.created_at|date:"M d, Y H:i" }}</td>
+                                            <td>{{ issue.updated_at|date:"M d, Y H:i" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            You haven't reported any issues yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

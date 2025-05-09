@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Upcoming Meetings -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Upcoming Meetings</h5>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_meetings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Students</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in upcoming_meetings %}
+                                    <tr>
+                                        <td>{{ meeting.date }}</td>
+                                        <td>{{ meeting.time }}</td>
+                                        <td>
+                                            {% for student in meeting.students.all %}
+                                                {{ student.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'proctor:meeting_detail' meeting.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No upcoming meetings scheduled.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Past Meetings -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Past Meetings</h5>
+                </div>
+                <div class="card-body">
+                    {% if past_meetings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Students</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in past_meetings %}
+                                    <tr>
+                                        <td>{{ meeting.date }}</td>
+                                        <td>{{ meeting.time }}</td>
+                                        <td>
+                                            {% for student in meeting.students.all %}
+                                                {{ student.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% if meeting.is_completed %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif meeting.is_cancelled %}
+                                                <span class="badge bg-danger">Cancelled</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'proctor:meeting_detail' meeting.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No past meetings found.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Completed Meetings -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Completed Meetings</h5>
+                </div>
+                <div class="card-body">
+                    {% if completed_meetings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Students</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in completed_meetings %}
+                                    <tr>
+                                        <td>{{ meeting.date }}</td>
+                                        <td>{{ meeting.time }}</td>
+                                        <td>
+                                            {% for student in meeting.students.all %}
+                                                {{ student.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'proctor:meeting_detail' meeting.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No completed meetings found.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Cancelled Meetings -->
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Cancelled Meetings</h5>
+                </div>
+                <div class="card-body">
+                    {% if cancelled_meetings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Students</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in cancelled_meetings %}
+                                    <tr>
+                                        <td>{{ meeting.date }}</td>
+                                        <td>{{ meeting.time }}</td>
+                                        <td>
+                                            {% for student in meeting.students.all %}
+                                                {{ student.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'proctor:meeting_detail' meeting.id %}" class="btn btn-sm btn-primary">View Details</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No cancelled meetings found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+    .table th {
+        background-color: #f8f9fc;
+    }
+    .badge {
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %} 

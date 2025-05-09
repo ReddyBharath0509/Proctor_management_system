@@ -1,0 +1,61 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Proctor Details</h4>
+                </div>
+                <div class="card-body">
+                    {% if proctor %}
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <h5 class="text-muted">Name</h5>
+                                <p class="h6">{{ proctor.user.get_full_name }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h5 class="text-muted">Department</h5>
+                                <p class="h6">{{ proctor.department }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h5 class="text-muted">Designation</h5>
+                                <p class="h6">{{ proctor.designation }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-muted">Email</h5>
+                                <p class="h6">{{ proctor.user.email }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-muted">Phone Number</h5>
+                                <p class="h6">{{ proctor.user.phone_number|default:"Not provided" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5 class="text-muted mb-3">Contact Options</h5>
+                            <a href="mailto:{{ proctor.user.email }}" class="btn btn-primary me-2">
+                                <i class="fas fa-envelope me-2"></i>Send Email
+                            </a>
+                            {% if proctor.user.phone_number %}
+                                <a href="tel:{{ proctor.user.phone_number }}" class="btn btn-success">
+                                    <i class="fas fa-phone me-2"></i>Call
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            You haven't been assigned a proctor yet. Please contact your department coordinator.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

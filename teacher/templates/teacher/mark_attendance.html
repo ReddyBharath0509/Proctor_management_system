@@ -1,0 +1,115 @@
+{% extends 'accounts/base.html' %}
+{% load teacher_tags %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Mark Attendance</h6>
+                </div>
+                <div class="card-body">
+                    {% if time_slot %}
+                    <div class="time-slot-info mb-4">
+                        <h5>Time Slot Details:</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Day:</strong> {{ time_slot.get_day_display }}</li>
+                            <li><strong>Time:</strong> {{ time_slot.get_time_display }}</li>
+                            <li><strong>Teacher:</strong> {{ time_slot.teacher.user.get_full_name }}</li>
+                            <li><strong>Date:</strong> {{ today|date:"M d, Y" }}</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Attendance Date</label>
+                            <input type="date" class="form-control" id="date" name="date" value="{{ today|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Roll Number</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                        <tr>
+                                            <td>{{ student.user.get_full_name }}</td>
+                                            <td>{{ student.roll_number }}</td>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="status_{{ student.id }}" 
+                                                           id="present_{{ student.id }}" 
+                                                           value="present" 
+                                                           {% if attendance_status|get_item:student.id %}checked{% endif %}>
+                                                    <label class="form-check-label" for="present_{{ student.id }}">Present</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" 
+                                                           name="status_{{ student.id }}" 
+                                                           id="absent_{{ student.id }}" 
+                                                           value="absent"
+                                                           {% if not attendance_status|get_item:student.id %}checked{% endif %}>
+                                                    <label class="form-check-label" for="absent_{{ student.id }}">Absent</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="remarks_{{ student.id }}" placeholder="Enter remarks">
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">No students assigned to this time slot</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-4">
+                            <a href="{% url 'teacher_timetable' %}" class="btn btn-secondary me-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Attendance
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+        background-color: #f8f9fc;
+    }
+    .time-slot-info {
+        background-color: #f8f9fc;
+        padding: 15px;
+        border-radius: 10px;
+    }
+    .form-check-input:checked {
+        background-color: #4e73df;
+        border-color: #4e73df;
+    }
+    .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+    }
+    .table {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %} 

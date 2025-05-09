@@ -1,0 +1,45 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Your Chats</h6>
+                </div>
+                <div class="card-body">
+                    {% if chat_rooms %}
+                        <div class="list-group">
+                            {% for room in chat_rooms %}
+                                <a href="{% url 'chat:chat_room' room.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            {% if user.role == 'teacher' %}
+                                                {{ room.student.user.get_full_name }}
+                                            {% else %}
+                                                {{ room.teacher.user.get_full_name }}
+                                            {% endif %}
+                                        </h5>
+                                        <small>{{ room.updated_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        {% if room.messages.last %}
+                                            {{ room.messages.last.content|truncatechars:50 }}
+                                        {% else %}
+                                            No messages yet
+                                        {% endif %}
+                                    </p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No chat rooms yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

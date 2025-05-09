@@ -1,0 +1,103 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Issue Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{{ issue.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Status:</strong>
+                        <span class="badge {% if issue.status == 'open' %}bg-danger{% elif issue.status == 'in_progress' %}bg-warning{% elif issue.status == 'resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ issue.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Priority:</strong>
+                        <span class="badge {% if issue.priority == 'urgent' %}bg-danger{% elif issue.priority == 'high' %}bg-warning{% elif issue.priority == 'medium' %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ issue.get_priority_display }}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Description:</strong>
+                        <p class="mt-2">{{ issue.description }}</p>
+                    </div>
+                    <div class="text-muted">
+                        <small>Created: {{ issue.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Comments</h5>
+                </div>
+                <div class="card-body">
+                    {% if comments %}
+                        {% for comment in comments %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comment.user.get_full_name }}</strong>
+                                <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <p class="mt-2">{{ comment.comment }}</p>
+                        </div>
+                        {% if not forloop.last %}
+                        <hr>
+                        {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No comments yet.</p>
+                    {% endif %}
+
+                    <!-- Add Comment Form -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Add a Comment</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issue Info Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Issue Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>Created:</strong><br>
+                            {{ issue.created_at|date:"M d, Y H:i" }}
+                        </li>
+                        <li class="mb-2">
+                            <strong>Last Updated:</strong><br>
+                            {{ issue.updated_at|date:"M d, Y H:i" }}
+                        </li>
+                        {% if issue.resolved_at %}
+                        <li class="mb-2">
+                            <strong>Resolved:</strong><br>
+                            {{ issue.resolved_at|date:"M d, Y H:i" }}
+                        </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            <strong>Comments:</strong><br>
+                            {{ comments|length }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

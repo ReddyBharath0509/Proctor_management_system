@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Deleted Successfully{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Success</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h5 class="alert-heading">User Deleted Successfully!</h5>
+                        <p>The user and all associated records have been permanently deleted from the system.</p>
+                    </div>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'manage_users' %}" class="btn btn-primary">
+                            <i class="fas fa-users"></i> Return to User Management
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

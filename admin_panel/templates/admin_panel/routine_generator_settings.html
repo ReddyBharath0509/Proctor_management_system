@@ -1,0 +1,288 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Routine Generator Settings</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h5>General Settings</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="students_per_slot" class="form-label">Students per Slot</label>
+                                    <input type="number" class="form-control" id="students_per_slot" name="students_per_slot" value="{{ settings.students_per_slot }}" min="1" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="min_slots_per_teacher" class="form-label">Min Slots per Teacher</label>
+                                    <input type="number" class="form-control" id="min_slots_per_teacher" name="min_slots_per_teacher" value="{{ settings.min_slots_per_teacher }}" min="1" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="max_slots_per_teacher" class="form-label">Max Slots per Teacher</label>
+                                    <input type="number" class="form-control" id="max_slots_per_teacher" name="max_slots_per_teacher" value="{{ settings.max_slots_per_teacher }}" min="1" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check mt-4">
+                                        <input type="checkbox" class="form-check-input" id="avoid_conflicts" name="avoid_conflicts" {% if settings.avoid_conflicts %}checked{% endif %}>
+                                        <label class="form-check-label" for="avoid_conflicts">Avoid Conflicts</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="balance_load" name="balance_load" {% if settings.balance_load %}checked{% endif %}>
+                                        <label class="form-check-label" for="balance_load">Balance Load</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Proctor Details Configuration -->
+                            <div class="mb-3">
+                                <h6>Proctor Details Configuration</h6>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Configure how proctor details are handled in the routine generation.
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="use_existing_proctors" name="use_existing_proctors" {% if settings.use_existing_proctors %}checked{% endif %}>
+                                            <label class="form-check-label" for="use_existing_proctors">Use Existing Proctor Assignments</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="allow_proctor_changes" name="allow_proctor_changes" {% if settings.allow_proctor_changes %}checked{% endif %}>
+                                            <label class="form-check-label" for="allow_proctor_changes">Allow Proctor Changes</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Student Semester Configuration -->
+                            <div class="mb-3">
+                                <h6>Student Semester Configuration</h6>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Configure how student semesters are handled in the routine generation.
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="semester_filter" class="form-label">Filter by Semester</label>
+                                        <select class="form-select" id="semester_filter" name="semester_filter" multiple>
+                                            {% for semester in available_semesters %}
+                                                <option value="{{ semester }}" {% if semester in settings.semester_filter %}selected{% endif %}>
+                                                    Semester {{ semester }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <small class="form-text text-muted">Leave empty to include all semesters</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check mt-4">
+                                            <input type="checkbox" class="form-check-input" id="group_by_semester" name="group_by_semester" {% if settings.group_by_semester %}checked{% endif %}>
+                                            <label class="form-check-label" for="group_by_semester">Group Students by Semester</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Preferred Days</h5>
+                            <div class="row">
+                                {% for value, label in day_choices %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="day_{{ value }}" name="preferred_days" value="{{ value }}" {% if value in settings.preferred_days %}checked{% endif %}>
+                                            <label class="form-check-label" for="day_{{ value }}">{{ label }}</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Preferred Times</h5>
+                            <div class="row">
+                                {% for value, label in time_choices %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="time_{{ value }}" name="preferred_times" value="{{ value }}" {% if value in settings.preferred_times %}checked{% endif %}>
+                                            <label class="form-check-label" for="time_{{ value }}">{{ label }}</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Teacher Constraints</h5>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Specify constraints for specific teachers. Leave empty to use general settings.
+                            </div>
+                            <div id="teacher-constraints">
+                                {% for teacher in teachers %}
+                                    <div class="card mb-3">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">{{ teacher.user.get_full_name }}</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Preferred Days</label>
+                                                <div class="row">
+                                                    {% for value, label in day_choices %}
+                                                        <div class="col-md-4 mb-2">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" id="teacher_{{ teacher.id }}_day_{{ value }}" name="teacher_constraints[{{ teacher.id }}][preferred_days]" value="{{ value }}" 
+                                                                    {% if settings.teacher_constraints|get_item:teacher.id|get_item:'preferred_days'|contains:value %}checked{% endif %}>
+                                                                <label class="form-check-label" for="teacher_{{ teacher.id }}_day_{{ value }}">{{ label }}</label>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Preferred Times</label>
+                                                <div class="row">
+                                                    {% for value, label in time_choices %}
+                                                        <div class="col-md-4 mb-2">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" id="teacher_{{ teacher.id }}_time_{{ value }}" name="teacher_constraints[{{ teacher.id }}][preferred_times]" value="{{ value }}"
+                                                                    {% if settings.teacher_constraints|get_item:teacher.id|get_item:'preferred_times'|contains:value %}checked{% endif %}>
+                                                                <label class="form-check-label" for="teacher_{{ teacher.id }}_time_{{ value }}">{{ label }}</label>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Student Constraints</h5>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Specify constraints for specific students. Leave empty to use general settings.
+                            </div>
+                            <div class="mb-3">
+                                <label for="student-filter" class="form-label">Filter Students</label>
+                                <input type="text" class="form-control" id="student-filter" placeholder="Search by name or roll number">
+                            </div>
+                            <div id="student-constraints">
+                                {% for student in students %}
+                                    <div class="card mb-3 student-constraint" data-student-name="{{ student.user.get_full_name|lower }}" data-student-roll="{{ student.roll_number|lower }}">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">{{ student.user.get_full_name }} ({{ student.roll_number }})</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Preferred Days</label>
+                                                <div class="row">
+                                                    {% for value, label in day_choices %}
+                                                        <div class="col-md-4 mb-2">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" id="student_{{ student.id }}_day_{{ value }}" name="student_constraints[{{ student.id }}][preferred_days]" value="{{ value }}"
+                                                                    {% if settings.student_constraints|get_item:student.id|get_item:'preferred_days'|contains:value %}checked{% endif %}>
+                                                                <label class="form-check-label" for="student_{{ student.id }}_day_{{ value }}">{{ label }}</label>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Preferred Times</label>
+                                                <div class="row">
+                                                    {% for value, label in time_choices %}
+                                                        <div class="col-md-4 mb-2">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" id="student_{{ student.id }}_time_{{ value }}" name="student_constraints[{{ student.id }}][preferred_times]" value="{{ value }}"
+                                                                    {% if settings.student_constraints|get_item:student.id|get_item:'preferred_times'|contains:value %}checked{% endif %}>
+                                                                <label class="form-check-label" for="student_{{ student.id }}_time_{{ value }}">{{ label }}</label>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+    .form-control {
+        border-radius: 8px;
+    }
+    .form-select {
+        border-radius: 8px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Student filter functionality
+        const studentFilter = document.getElementById('student-filter');
+        const studentConstraints = document.querySelectorAll('.student-constraint');
+        
+        studentFilter.addEventListener('input', function() {
+            const filterValue = this.value.toLowerCase();
+            
+            studentConstraints.forEach(function(constraint) {
+                const studentName = constraint.getAttribute('data-student-name');
+                const studentRoll = constraint.getAttribute('data-student-roll');
+                
+                if (studentName.includes(filterValue) || studentRoll.includes(filterValue)) {
+                    constraint.style.display = 'block';
+                } else {
+                    constraint.style.display = 'none';
+                }
+            });
+        });
+        
+        // Initialize semester select with Select2 for better UX
+        if (typeof $.fn.select2 !== 'undefined') {
+            $('#semester_filter').select2({
+                placeholder: 'Select semesters',
+                allowClear: true,
+                width: '100%'
+            });
+        }
+    });
+</script>
+{% endblock %} 

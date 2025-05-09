@@ -1,0 +1,133 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Manage Timetable</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="mb-4">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="day" class="form-label">Day</label>
+                                <select class="form-select" id="day" name="day" required>
+                                    {% for value, label in day_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="time" class="form-label">Time</label>
+                                <select class="form-select" id="time" name="time" required>
+                                    {% for value, label in time_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="subject" class="form-label">Subject Name</label>
+                                <input type="text" class="form-control" id="subject" name="subject" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="teacher" class="form-label">Teacher</label>
+                                <select class="form-select" id="teacher" name="teacher" required>
+                                    {% for teacher in teachers %}
+                                        <option value="{{ teacher.id }}">{{ teacher.user.get_full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="students" class="form-label">Students</label>
+                                <select class="form-select" id="students" name="students" multiple required>
+                                    {% for student in students %}
+                                        <option value="{{ student.id }}">{{ student.user.get_full_name }} ({{ student.roll_number }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Time Slot
+                        </button>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Subject</th>
+                                    <th>Teacher</th>
+                                    <th>Students</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for slot in time_slots %}
+                                    <tr>
+                                        <td>{{ slot.get_day_display }}</td>
+                                        <td>{{ slot.get_time_display }}</td>
+                                        <td>{{ slot.subject }}</td>
+                                        <td>{{ slot.teacher.user.get_full_name }}</td>
+                                        <td>
+                                            <ul class="list-unstyled mb-0">
+                                                {% for student in slot.students.all %}
+                                                    <li>{{ student.user.get_full_name }} ({{ student.roll_number }})</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'delete_time_slot_timetable' slot.id %}" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No time slots found</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+    .form-select {
+        border-radius: 8px;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<script>
+    // Initialize multiple select
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentsSelect = document.getElementById('students');
+        if (studentsSelect) {
+            // You can add a select2 or similar library here for better UX
+            studentsSelect.style.height = '150px';
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Meeting Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header {% if meeting.status == 'upcoming' %}bg-warning text-dark{% elif meeting.status == 'completed' %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                    <h4 class="mb-0">Meeting Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Date & Time</h5>
+                            <p>{{ meeting.date|date:"F d, Y" }} at {{ meeting.time|time:"g:i A" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Status</h5>
+                            <span class="badge {% if meeting.status == 'upcoming' %}bg-warning text-dark{% elif meeting.status == 'completed' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ meeting.status|title }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ meeting.description|default:"No description provided." }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Students</h5>
+                        {% if students %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Roll Number</th>
+                                            <th>Department</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for student in students %}
+                                            <tr>
+                                                <td>{{ student.user.get_full_name }}</td>
+                                                <td>{{ student.roll_number }}</td>
+                                                <td>{{ student.department }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No students assigned to this meeting.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'teacher_meetings' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Meetings
+                        </a>
+                        {% if meeting.status == 'upcoming' and meeting.date == today %}
+                            <button class="btn btn-primary" id="startMeetingBtn">
+                                <i class="fas fa-video"></i> Start Meeting
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,95 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Time Slots</h3>
+                    <a href="{% url 'add_time_slot' %}" class="btn btn-light">
+                        <i class="fas fa-plus"></i> Add Time Slot
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Time</th>
+                                    <th>Teacher</th>
+                                    <th>Students</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if time_slots %}
+                                    {% for slot in time_slots %}
+                                        <tr>
+                                            <td>{{ slot.get_day_display }}</td>
+                                            <td>{{ slot.get_time_display }}</td>
+                                            <td>{{ slot.teacher.user.get_full_name }}</td>
+                                            <td>
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for student in slot.students.all %}
+                                                        <li>{{ student.user.get_full_name }} ({{ student.roll_number }})</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <span class="badge {% if slot.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                                    {{ slot.is_active|yesno:"Active,Inactive" }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="{% url 'edit_time_slot' slot.id %}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <a href="{% url 'delete_time_slot' slot.id %}" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No time slots found</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+    .badge {
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+    .btn-group {
+        gap: 5px;
+    }
+</style>
+{% endblock %} 

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate Routine{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Generate Routine</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Current Settings</h5>
+                        <ul>
+                            <li>Maximum Students per Slot: {{ settings.students_per_slot }}</li>
+                            <li>Minimum Slots per Teacher: {{ settings.min_slots_per_teacher }}</li>
+                            <li>Maximum Slots per Teacher: {{ settings.max_slots_per_teacher }}</li>
+                            <li>Total Teachers: {{ teachers_count }}</li>
+                            <li>Total Students: {{ students_count }}</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h5>Warning</h5>
+                        <p>Generating a new routine will delete all existing time slots. This action cannot be undone.</p>
+                    </div>
+
+                    <form method="post" onsubmit="return confirm('Are you sure you want to generate a new routine? This will delete all existing time slots.');">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger">Generate New Routine</button>
+                            <a href="{% url 'routine_generator_settings' %}" class="btn btn-secondary">Back to Settings</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,82 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Student Profile</h4>
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h5 class="text-muted">Name</h5>
+                            <p class="h6">{{ student.user.get_full_name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-muted">Roll Number</h5>
+                            <p class="h6">{{ student.roll_number }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5 class="text-muted">Email</h5>
+                            <p class="h6">{{ student.user.email }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Department</h5>
+                            <p class="h6">{{ student.department }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Semester</h5>
+                            <p class="h6">{{ student.semester }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Phone Number</h5>
+                            <p class="h6">{{ student.user.phone_number|default:"Not provided" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Date of Birth</h5>
+                            <p class="h6">{{ student.date_of_birth|date:"M d, Y"|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5 class="text-muted mb-3">Actions</h5>
+                        <a href="{% url 'edit_profile' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-2"></i>Edit Profile
+                        </a>
+                        <a href="{% url 'change_password' %}" class="btn btn-warning">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    .text-muted {
+        color: #6c757d !important;
+    }
+    .h6 {
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %} 

@@ -1,0 +1,32 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Class Timetable</h2>
+<table class="table table-bordered text-center align-middle" style="background: #fff;">
+    <thead>
+        <tr>
+            <th>Time</th>
+            {% for day in day_choices %}
+                <th>{{ day.1 }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for time in time_choices %}
+            <tr>
+                <td><strong>{{ time.1 }}</strong></td>
+                {% for day in day_choices %}
+                    <td>
+                        {% for slot in regular_slots %}
+                            {% if slot.day == day.0 and slot.time == time.0 %}
+                                <div><strong>{{ slot.subject }}</strong></div>
+                                <div style="font-size: 0.9em;">{{ slot.teacher.user.get_full_name }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

@@ -1,0 +1,72 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}Meeting Summaries{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Meeting Summaries</h4>
+                </div>
+                <div class="card-body">
+                    {% if meetings_with_summaries %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Students</th>
+                                        <th>Summary</th>
+                                        <th>Action Items</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for meeting in meetings_with_summaries %}
+                                        <tr>
+                                            <td>{{ meeting.date|date:"F d, Y" }}</td>
+                                            <td>{{ meeting.time|time:"g:i A" }}</td>
+                                            <td>
+                                                {% for student in meeting.students.all %}
+                                                    {{ student.user.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% if meeting.summary %}
+                                                    {{ meeting.summary.summary_text|truncatechars:50 }}
+                                                {% else %}
+                                                    <a href="{% url 'add_meeting_summary' meeting.id %}" class="btn btn-sm btn-primary">Add Summary</a>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if meeting.summary and meeting.summary.action_items %}
+                                                    {{ meeting.summary.action_items|truncatechars:50 }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if meeting.summary %}
+                                                    <a href="{% url 'view_meeting_summary' meeting.id %}" class="btn btn-sm btn-info">View Details</a>
+                                                {% else %}
+                                                    <a href="{% url 'add_meeting_summary' meeting.id %}" class="btn btn-sm btn-primary">Add Summary</a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">No meeting summaries available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
